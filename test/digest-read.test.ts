@@ -26,13 +26,14 @@ describe('readNight', () => {
       owner: 'rook',
       runs: 4,
       retries: 3,
+      fails: 0,
       lastStatus: 'ok',
       lastError: 'upstream 503',
       firstAt: '2026-10-29T01:30:00+01:00',
       lastAt: '2026-10-29T01:37:00+01:00',
     });
     expect(byJob['lane/sync']).toMatchObject({ runs: 8, retries: 1, lastStatus: 'ok', firstAt: '2026-10-28T23:00:06+01:00', lastAt: '2026-10-29T05:00:04+01:00' });
-    expect(byJob['notes/backup']).toMatchObject({ runs: 1, lastStatus: 'fail', lastError: 'quota exceeded' });
+    expect(byJob['notes/backup']).toMatchObject({ runs: 1, fails: 1, lastStatus: 'fail', lastError: 'quota exceeded' });
     expect(byJob['digest/render']).toMatchObject({ owner: null, runs: 1, lastError: null });
   });
 
@@ -66,6 +67,6 @@ describe('readNight', () => {
     const n = readNight(dir, '2026-01-01')!;
     expect(n.badLines).toBe(3);
     expect(n.rows.map((r) => r.job)).toEqual(['a', 'c']);
-    expect(n.rows[1]).toMatchObject({ lastStatus: 'fail', lastError: 'second' });
+    expect(n.rows[1]).toMatchObject({ retries: 1, fails: 1, lastStatus: 'fail', lastError: 'second' });
   });
 });
