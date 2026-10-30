@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { loadConfig, type RigConfig } from './config.js';
-import { lane } from './lane.js';
 import { readNight } from './digest/read.js';
+import { lane } from './lane.js';
 import { readStatus } from './status.js';
 import { DigestMissing, DigestPage } from './views/digest.js';
 import { Layout } from './views/layout.js';
@@ -25,17 +25,24 @@ export function createApp(config: RigConfig = loadConfig()) {
     const night = readNight(config.runsDir, name);
     if (night === null) {
       return c.html(
-        <Layout title={`digest · ${name}`} lane={lane()}>
+        <Layout title={`digest Â· ${name}`} lane={lane()}>
           <DigestMissing night={name} />
         </Layout>,
         404,
       );
     }
     return c.html(
-      <Layout title={`digest · ${name}`} lane={lane()}>
+      <Layout title={`digest Â· ${name}`} lane={lane()}>
         <DigestPage night={night} />
       </Layout>,
     );
+  });
+
+  app.get('/api/digest/:night', (c) => {
+    const night = c.req.param('night');
+    const result = readNight(config.runsDir, night);
+    if (result === null) return c.json({ error: 'no run log', night }, 404);
+    return c.json(result);
   });
 
   return app;
