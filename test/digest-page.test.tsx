@@ -22,6 +22,7 @@ describe('GET /digest/:night', () => {
       expect(html).toContain(`<td>${job}</td>`);
     }
     expect(rowOf(html, 'digest/render')).toContain('<td>—</td>');
+    expect(html).toContain('<td>digest/render</td><td>—</td>');
   });
 
   it('marks retries >= 3 and fails, and leaves clean rows alone', async () => {
